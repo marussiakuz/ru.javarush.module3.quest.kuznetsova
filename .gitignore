@@ -8,8 +8,8 @@ target/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
-.idea
-.mvn
+.idea/
+.mvn/
 mvnw
 mvnw.cmd
 ru.javarush.module3.quest.kuznetsova.iml
