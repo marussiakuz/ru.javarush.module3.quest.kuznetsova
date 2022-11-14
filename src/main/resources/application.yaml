@@ -1,0 +1,13 @@
+h2:
+  datasource:
+    url: jdbc:h2:mem:quest
+    username: test
+    password: test
+    driver-class-name: org.h2.Driver
+    init-sql: h2.sql
+  console:
+    enabled: true
+    path: /search/console
+    settings:
+      trace: false
+      web-allow-others: false
