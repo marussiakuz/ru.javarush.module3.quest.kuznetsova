@@ -1,17 +1,20 @@
 package ru.javarush.quest.repository;
 
-import ru.javarush.quest.model.quest.*;
+import ru.javarush.quest.model.dto.ChoiceOutDto;
+import ru.javarush.quest.model.dto.QuestOutDto;
+import ru.javarush.quest.model.dto.StepOutDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface IQuestRepository {
 
     List<QuestOutDto> getQuests();
 
-    Optional<Quest> getQuestById();
+    QuestOutDto getQuestById(long id);
 
     StepOutDto getStartStepByQuestId(long questId);
 
     List<ChoiceOutDto> getChoicesByStepId(long stepId);
+
+    StepOutDto getStepById(long id);
 }

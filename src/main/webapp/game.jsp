@@ -1,22 +1,27 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="ru.javarush.quest.model.quest.StepOutDto" %>
-<html>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<!DOCTYPE html>
 <head>
     <title>Game</title>
     <!------ Include the above in your HEAD tag ---------->
-    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link href="${contextPath}/resources/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!------ Include the above in your HEAD tag ---------->
 </head>
 <body>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<jsp:useBean id="userInfo" scope="session" type="ru.javarush.quest.model.dto.UserShortDto"/>
+<jsp:useBean id="currentStep" scope="session" type="ru.javarush.quest.model.dto.StepOutDto"/>
+<jsp:useBean id="countOfStep" scope="session" type="java.lang.Integer"/>
+<jsp:useBean id="failureCount" scope="session" type="java.lang.Integer"/>
+<jsp:useBean id="winCount" scope="session" type="java.lang.Integer"/>
+<jsp:useBean id="currentQuest" scope="session" type="ru.javarush.quest.model.dto.QuestOutDto"/>
 <div class="container-fluid bg-info">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><span class="label label-warning" id="qid"></span> You've lost your memory.<br> Accept the UFO challenge?</h3>
+                <h3><span class="label label-warning" id="qid">${countOfStep}</span> ${currentStep.question}</h3>
             </div>
             <div class="modal-body">
                 <div class="col-xs-3 col-xs-offset-5">
@@ -33,9 +38,8 @@
                 </div>
 
                 <div class="quiz" id="quiz" data-toggle="buttons">
-                    <c:forEach items="${quests}" var="quest" varStatus="status">
-                    <label class="element-animation1 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value="1">Take</label>
-                    <label class="element-animation2 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value="2">Reject</label>
+                    <c:forEach items="${currentStep.choices}" var="choice" varStatus="status">
+                    <label onclick="window.location='/quest/${currentQuest.id}?choice=${choice.id}'" class="element-animation1 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value=${choice.id}> ${choice.answer}</label>
                     </c:forEach>
                 </div>
             </div>
@@ -45,7 +49,41 @@
         </div>
     </div>
 </div>
+
+<a class="float-sm-right" data-toggle="modal" data-target="#exampleModal" style="position:fixed;bottom:5px;right:5px;margin:0;padding:5px 3px;" href="#">STATISTIC</a>
+
+<!-- Modal -->
+<div class="modal" tabindex="-1" role="dialog" id="exampleModal" data-bs-target="#staticBackdrop">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Statistic</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><b>Name:</b> ${userInfo.name}</p>
+                <p><b>IP address:</b> ${userInfo.ip}</p>
+                <p><b>Quests finished:</b> ${failureCount + winCount}</p>
+                <p><b>Won:</b> ${winCount}</p>
+                <p><b>Lost:</b> ${failureCount}</p>
+                <p><b>Current Quest:</b> ${currentQuest.name} </p>
+                <p><b>Current Step:</b> ${countOfStep}</p>
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
+    .modal {
+        background-color: white;
+    }
+
     #qid {
         padding: 10px 15px;
         -moz-border-radius: 50px;
@@ -62,7 +100,6 @@
         -moz-transition-duration: .3s;
         -o-transition-duration: .3s
     }
-
     label.btn:hover {
         text-shadow: 0 3px 2px rgba(0,0,0,0.4);
         -webkit-transform: scale(1.1);
@@ -73,7 +110,6 @@
         text-align: left;
         position: relative
     }
-
     label .btn-label {
         position: absolute;
         left: 0;
@@ -83,7 +119,6 @@
         background: rgba(0,0,0,.15);
         height: 100%
     }
-
     label .glyphicon {
         top: 34%
     }
@@ -125,22 +160,18 @@
             opacity: 0;
             transform: translate(-1500px,0px)
         }
-
         60% {
             opacity: 1;
             transform: translate(30px,0px)
         }
-
         80% {
             transform: translate(-10px,0px)
         }
-
         100% {
             opacity: 1;
             transform: translate(0px,0px)
         }
     }
-
     @-webkit-keyframes animationFrames {
         0% {
             opacity: 0;
@@ -150,23 +181,19 @@
             opacity: 1;
             -webkit-transform: translate(30px,0px)
         }
-
         80% {
             -webkit-transform: translate(-10px,0px)
         }
-
         100% {
             opacity: 1;
             -webkit-transform: translate(0px,0px)
         }
     }
-
     @-ms-keyframes animationFrames {
         0% {
             opacity: 0;
             -ms-transform: translate(-1500px,0px)
         }
-
         60% {
             opacity: 1;
             -ms-transform: translate(30px,0px)
@@ -174,18 +201,15 @@
         80% {
             -ms-transform: translate(-10px,0px)
         }
-
         100% {
             opacity: 1;
             -ms-transform: translate(0px,0px)
         }
     }
-
     .modal-header {
         background-color: transparent;
         color: inherit
     }
-
     .modal-body {
         min-height: 205px
     }
@@ -347,32 +371,26 @@
         0% {
             background-color: #000
         }
-
         100% {
             background-color: #FFF
         }
     }
-
     @-webkit-keyframes fadeG {
         0% {
             background-color: #000
         }
-
         100% {
             background-color: #FFF
         }
     }
-
     @-ms-keyframes fadeG {
         0% {
             background-color: #000
         }
-
         100% {
             background-color: #FFF
         }
     }
-
     @-o-keyframes fadeG {
         0% {
             background-color: #000
@@ -381,54 +399,17 @@
             background-color: #FFF
         }
     }
-
     @keyframes fadeG {
         0% {
             background-color: #000
         }
-
         100% {
             background-color: #FFF
         }
     }
 </style>
 <script>
-    let question;
-    let answerFirst;
-    let answerSecond;
 
-
-
-    $(function(){
-        var loading = $('#loadbar').hide();
-        $(document)
-            .ajaxStart(function () {
-                loading.show();
-            }).ajaxStop(function () {
-            loading.hide();
-        });
-
-        $("label.btn").on('click',function () {
-            var choice = $(this).find('input:radio').val();
-            $('#loadbar').show();
-            $('#quiz').fadeOut();
-            setTimeout(function(){
-                $( "#answer" ).html(  $(this).checking(choice) );
-                $('#quiz').show();
-                $('#loadbar').fadeOut();
-                /* something else */
-            }, 1500);
-        });
-
-        $ans = 3;
-
-        $.fn.checking = function(ck) {
-            if (ck != $ans)
-                return 'INCORRECT';
-            else
-                return 'CORRECT';
-        };
-    });
 </script>
 </body>
 </html>

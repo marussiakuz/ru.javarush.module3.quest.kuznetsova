@@ -1,28 +1,36 @@
 package ru.javarush.quest.controller;
 
-import ru.javarush.quest.model.user.UserInfo;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.ServletException;
+import ru.javarush.quest.model.dto.UserShortDto;
+import ru.javarush.quest.service.UserService;
+
+import javax.inject.Inject;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 
+@Slf4j
 @WebServlet(name = "userServlet", value = "/user")
 public class UserServlet extends HttpServlet {
 
+    @Inject
+    private UserService userService;
+
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession currentSession = req.getSession(true);
 
-        UserInfo userInfo = UserInfo.builder()
-                .name(req.getParameter("userName"))
-                .build();
+        UserShortDto userShortDto = userService.addUser(req.getParameter("userName"), req.getRemoteAddr());
 
-        currentSession.setAttribute("userInfo", userInfo);
+        currentSession.setAttribute("userInfo", userShortDto);
+        currentSession.setAttribute("isStart", true);
+        currentSession.setAttribute("winCount", 0);
+        currentSession.setAttribute("failureCount", 0);
 
-        Cookie userNameCookie = new Cookie("userName", userInfo.getName());
+        Cookie userNameCookie = new Cookie("userName", userShortDto.getName());
         resp.addCookie(userNameCookie);
 
-        getServletContext().getRequestDispatcher("/quest").forward(req, resp);
+        resp.sendRedirect("/quest");
     }
 }

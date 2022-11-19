@@ -1,8 +1,8 @@
 package ru.javarush.quest.service;
 
-import ru.javarush.quest.model.quest.ChoiceOutDto;
-import ru.javarush.quest.model.quest.QuestOutDto;
-import ru.javarush.quest.model.quest.StepOutDto;
+import ru.javarush.quest.model.dto.ChoiceOutDto;
+import ru.javarush.quest.model.dto.QuestOutDto;
+import ru.javarush.quest.model.dto.StepOutDto;
 import ru.javarush.quest.repository.IQuestRepository;
 
 import javax.annotation.ManagedBean;
@@ -22,6 +22,11 @@ public class QuestService implements IQuestService {
     }
 
     @Override
+    public QuestOutDto getQuestById(long id) {
+        return questRepository.getQuestById(id);
+    }
+
+    @Override
     public StepOutDto getStartStepByQuestId(long questId) {
         StepOutDto startStep = questRepository.getStartStepByQuestId(questId);
 
@@ -30,5 +35,16 @@ public class QuestService implements IQuestService {
         startStep.setChoices(choices);
 
         return startStep;
+    }
+
+    @Override
+    public StepOutDto getStepById(long id) {
+        StepOutDto nextStep = questRepository.getStepById(id);
+
+        List<ChoiceOutDto> choices = questRepository.getChoicesByStepId(id);
+
+        nextStep.setChoices(choices);
+
+        return nextStep;
     }
 }
