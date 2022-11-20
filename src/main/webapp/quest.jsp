@@ -1,15 +1,17 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-         pageEncoding="ISO-8859-1"%>
+<%@ page contentType="text/html; charset=ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html>
+
 <head>
-    <title>Title</title>
+    <title>QuestList</title>
     <link href="${contextPath}/resources/bootstrap-4.0.0-dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
 </head>
+
 <body>
+<jsp:useBean id="quests" scope="request" type="java.util.List"/>
 <jsp:useBean id="userInfo" scope="session" type="ru.javarush.quest.model.dto.UserShortDto"/>
 <jsp:useBean id="isStart"  scope="session" type="java.lang.Boolean"/>
 <% if (!isStart) { %>
@@ -22,29 +24,28 @@
 %>
 <% }
 %>
+
 <div class="row d-flex justify-content-center">
     <div class="col-md-6">
-
-            <h3 class="text-muted" align="center">Quests</h3>
-    <jsp:useBean id="quests" scope="request" type="java.util.List"/>
-            <ul class="list-group">
-    <c:forEach items="${quests}" var="quest" varStatus="status">
-        <a onclick="go_to_quest(${quest.id})" href="#" class="${status.index % 2 == 0? 'list-group-item list-group-item-action active' : 'list-group-item list-group-item-action'}" aria-current=true>
-            <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">${quest.name}</h5>
-                <small>${quest.id}</small>
-            </div>
-            <p class="mb-1">${quest.description}</p>
-            <small><div class="image-parent">
-                <img src="${quest.img}" class="img-fluid" alt="quixote">
-            </div></small>
-        </a>
-    </c:forEach>
-</ul>
+        <h3 class="text-muted" align="center">Quests</h3>
+        <ul class="list-group">
+            <c:forEach items="${quests}" var="quest" varStatus="status">
+                <a onclick="go_to_quest(${quest.id})" href="#" class="${status.index % 2 == 0? 'list-group-item list-group-item-action active' : 'list-group-item list-group-item-action'}" aria-current=true>
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">${quest.name}</h5>
+                        <small>${quest.id}</small>
+                    </div>
+                    <p class="mb-1">${quest.description}</p>
+                    <small class="image-parent">
+                        <img src="${quest.img}" class="img-fluid" alt="quixote">
+                    </small>
+                </a>
+            </c:forEach>
+        </ul>
     </div>
 </div>
 
-<a class="float-sm-right" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" style="position:fixed;bottom:5px;right:5px;margin:0;padding:5px 3px;" href="#">STATISTIC</a>
+<a class="float-sm-right" data-toggle="modal" data-target="#exampleModal" style="position:fixed;bottom:5px;right:5px;margin:0;padding:5px 3px;" href="#">STATISTIC</a>
 
 <!-- Modal -->
 <div class="modal" tabindex="-1" role="dialog" id="exampleModal" data-bs-target="#staticBackdrop">
@@ -66,7 +67,6 @@
                 <p><b>Current Step:</b> ${isStart || countOfStep == 0 ? 'no quest has been started yet' : countOfStep}</p>
             </div>
             <div class="modal-footer">
-
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -97,4 +97,3 @@
 </script>
 
 </body>
-</html>

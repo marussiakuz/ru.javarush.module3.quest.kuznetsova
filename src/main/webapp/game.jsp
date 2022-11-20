@@ -1,15 +1,15 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
+
 <!DOCTYPE html>
 <head>
-    <title>Game</title>
-    <!------ Include the above in your HEAD tag ---------->
+    <title>ProcessQuest</title>
     <link href="${contextPath}/resources/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!------ Include the above in your HEAD tag ---------->
 </head>
+
 <body>
 <jsp:useBean id="userInfo" scope="session" type="ru.javarush.quest.model.dto.UserShortDto"/>
 <jsp:useBean id="currentStep" scope="session" type="ru.javarush.quest.model.dto.StepOutDto"/>
@@ -39,7 +39,7 @@
 
                 <div class="quiz" id="quiz" data-toggle="buttons">
                     <c:forEach items="${currentStep.choices}" var="choice" varStatus="status">
-                    <label onclick="window.location='/quest/${currentQuest.id}?choice=${choice.id}'" class="element-animation1 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value=${choice.id}> ${choice.answer}</label>
+                    <label onclick="window.location='/quest/${currentQuest.id}?choice=${choice.id}'" class="element-animation${status.count} btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value=${choice.id}> ${choice.answer}</label>
                     </c:forEach>
                 </div>
             </div>
@@ -229,13 +229,13 @@
         -moz-animation-name: fadeG;
         -moz-animation-duration: .8800000000000001s;
         -moz-animation-iteration-count: infinite;
-        -moz-animation-direction: linear;
+        -moz-animation-direction: initial;
         -webkit-border-radius: 8px 8px 0 0;
         -webkit-transform: scale(0.4);
         -webkit-animation-name: fadeG;
         -webkit-animation-duration: .8800000000000001s;
         -webkit-animation-iteration-count: infinite;
-        -webkit-animation-direction: linear;
+        -webkit-animation-direction: initial;
         -ms-border-radius: 8px 8px 0 0;
         -ms-transform: scale(0.4);
         -ms-animation-name: fadeG;
@@ -247,13 +247,13 @@
         -o-animation-name: fadeG;
         -o-animation-duration: .8800000000000001s;
         -o-animation-iteration-count: infinite;
-        -o-animation-direction: linear;
+        -o-animation-direction: initial;
         border-radius: 8px 8px 0 0;
         transform: scale(0.4);
         animation-name: fadeG;
         animation-duration: .8800000000000001s;
         animation-iteration-count: infinite;
-        animation-direction: linear
+        animation-direction: initial;
     }
     #rotateG_01 {
         left: 0;
@@ -409,7 +409,5 @@
     }
 </style>
 <script>
-
 </script>
 </body>
-</html>

@@ -1,7 +1,9 @@
 package ru.javarush.quest.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.javarush.quest.exception.*;
+import ru.javarush.quest.exception.ChoiceContentException;
+import ru.javarush.quest.exception.ChoiceNotFoundException;
+import ru.javarush.quest.exception.SessionInvalidException;
 import ru.javarush.quest.model.dto.*;
 import ru.javarush.quest.service.IQuestService;
 
@@ -34,14 +36,7 @@ public class QuestServlet extends HttpServlet {
     private void startQuest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getSession().setAttribute("isStart", false);
 
-        long questId;
-
-        try {
-            questId = Long.parseLong(req.getPathInfo().split("/")[1]);
-        } catch (NumberFormatException e) {
-            throw new PathVariableInvalidException(String.format("Path variable choice id must be long value, but is %s",
-                    req.getPathInfo().split("/")[1]));
-        }
+        long questId = Long.parseLong(req.getPathInfo().split("/")[1]);
 
         HttpSession currentSession = req.getSession();
 
@@ -84,14 +79,7 @@ public class QuestServlet extends HttpServlet {
     }
 
     private ChoiceOutDto getChoice(HttpServletRequest req) {
-        long choiceId;
-
-        try {
-            choiceId = Long.parseLong(req.getParameter("choice"));
-        } catch (NumberFormatException e) {
-            throw new UrlParameterInvalidException(String.format("param choice must be long value, but is %s",
-                    req.getParameter("choice")));
-        }
+        long choiceId = Long.parseLong(req.getParameter("choice"));
 
         HttpSession currentSession = req.getSession();
 

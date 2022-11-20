@@ -1,14 +1,12 @@
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.Optional" %>
-<%@ page contentType="text/html; charset=ISO-8859-1"
-         pageEncoding="ISO-8859-1"%>
+<%@ page contentType="text/html; charset=ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Insert title here</title>
+    <title>WelcomePage</title>
     <link href="${contextPath}/resources/bootstrap-4.0.0-dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="//code.jquery.com/jquery.min.js"></script>
     <script>
@@ -16,14 +14,11 @@
     </script>
     <%
         Cookie[] cookies = request.getCookies();
-
         String userName = null;
-
         if(cookies != null){
             Optional<Cookie> userNameCookieOptional = Arrays.stream(cookies)
                     .filter(cookie -> cookie.getName().equals("userName"))
                     .findFirst();
-
         if(userNameCookieOptional.isPresent()) userName = userNameCookieOptional.get().getValue();
         }
     %>

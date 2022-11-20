@@ -1,6 +1,6 @@
 package ru.javarush.quest.repository;
 
-import ru.javarush.quest.DataBaseConnection;
+import ru.javarush.quest.controller.listener.DataBaseConnection;
 import ru.javarush.quest.exception.DataSourceIsNotAvailableException;
 import ru.javarush.quest.model.dto.*;
 import ru.javarush.quest.model.enums.State;
@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @ManagedBean
 public class QuestDbRepository implements IQuestRepository {
@@ -47,9 +48,9 @@ public class QuestDbRepository implements IQuestRepository {
     }
 
     @Override
-    public QuestOutDto getQuestById(long id) {
+    public Optional<QuestOutDto> getQuestById(long id) {
         PreparedStatement preparedStatement;
-        QuestOutDto quest = null;
+        Optional<QuestOutDto> questOptional = Optional.empty();
 
         try {
             Connection connection = dataBaseConnection.getDataSource().getConnection();
@@ -58,12 +59,14 @@ public class QuestDbRepository implements IQuestRepository {
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
-                quest = QuestOutDto.builder()
-                        .id(rs.getLong("quest_id"))
-                        .img(rs.getString("img"))
-                        .name(rs.getString("quest_name"))
-                        .description(rs.getString("description"))
-                        .build();
+                questOptional = Optional.of(
+                        QuestOutDto.builder()
+                                .id(rs.getLong("quest_id"))
+                                .img(rs.getString("img"))
+                                .name(rs.getString("quest_name"))
+                                .description(rs.getString("description"))
+                                .build()
+                );
             }
 
             connection.close();
@@ -72,13 +75,13 @@ public class QuestDbRepository implements IQuestRepository {
                     "quest id=%s", id));
         }
 
-        return quest;
+        return questOptional;
     }
 
     @Override
-    public StepOutDto getStartStepByQuestId(long questId) {
+    public Optional<StepOutDto> getStartStepByQuestId(long questId) {
         PreparedStatement preparedStatement;
-        StepOutDto step = null;
+        Optional<StepOutDto> stepOptional = Optional.empty();
 
         try {
             Connection connection = dataBaseConnection.getDataSource().getConnection();
@@ -88,10 +91,12 @@ public class QuestDbRepository implements IQuestRepository {
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
-                step = StepOutDto.builder()
-                        .id(rs.getLong("step_id"))
-                        .question(rs.getString("question"))
-                        .build();
+                stepOptional = Optional.of(
+                        StepOutDto.builder()
+                                .id(rs.getLong("step_id"))
+                                .question(rs.getString("question"))
+                                .build()
+                );
             }
 
             connection.close();
@@ -100,7 +105,7 @@ public class QuestDbRepository implements IQuestRepository {
                     "start step by questId=%s", questId));
         }
 
-        return step;
+        return stepOptional;
     }
 
     @Override
@@ -130,9 +135,9 @@ public class QuestDbRepository implements IQuestRepository {
     }
 
     @Override
-    public StepOutDto getStepById(long id) {
+    public Optional<StepOutDto> getStepById(long id) {
         PreparedStatement preparedStatement;
-        StepOutDto step = null;
+        Optional<StepOutDto> stepOptional = Optional.empty();
 
         try {
             Connection connection = dataBaseConnection.getDataSource().getConnection();
@@ -141,10 +146,12 @@ public class QuestDbRepository implements IQuestRepository {
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
-                step = StepOutDto.builder()
-                        .id(rs.getLong("step_id"))
-                        .question(rs.getString("question"))
-                        .build();
+                stepOptional = Optional.of(
+                        StepOutDto.builder()
+                                .id(rs.getLong("step_id"))
+                                .question(rs.getString("question"))
+                                .build()
+                );
             }
 
             connection.close();
@@ -154,7 +161,7 @@ public class QuestDbRepository implements IQuestRepository {
                     "step by id=%s", id));
         }
 
-        return step;
+        return stepOptional;
     }
 
     private ChoiceOutDto mapToChoiceOutDto(ResultSet resultSet) throws SQLException {

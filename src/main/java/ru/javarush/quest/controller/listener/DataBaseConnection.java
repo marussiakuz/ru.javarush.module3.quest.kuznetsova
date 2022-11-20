@@ -1,4 +1,4 @@
-package ru.javarush.quest;
+package ru.javarush.quest.controller.listener;
 
 import javax.sql.DataSource;
 
@@ -32,9 +32,14 @@ public class DataBaseConnection implements ServletContextListener {
         if (dataSource == null) {
             throw new DataSourceIsNotAvailableException("Data source wasn't initialized");
         }
-        String sql = readStreamToString(servletContextEvent.getServletContext());
+        executeSqlScript(servletContextEvent, "/WEB-INF/sql/schema.sql");
+        executeSqlScript(servletContextEvent, "/WEB-INF/sql/data.sql");
+    }
+
+    private void executeSqlScript(ServletContextEvent servletContextEvent, String file) {
+        String sql = readStreamToString(servletContextEvent.getServletContext(), file);
         if (StringUtils.isBlank(sql)) {
-            throw new DataSourceIsNotAvailableException("SQL script is empty");
+            throw new DataSourceIsNotAvailableException(String.format("SQL script is empty, file: %s", file));
         }
         try {
             log.info("Executing SQL script");
@@ -42,14 +47,12 @@ public class DataBaseConnection implements ServletContextListener {
             Statement statement = connection.createStatement();
             statement.execute(sql);
         } catch (SQLException e) {
-            throw new DataSourceIsNotAvailableException(String.format("Unable to create database table structure: %s",
-                    e));
+            throw new DataSourceIsNotAvailableException(String.format("Unable to execute SQL script: %s", e));
         }
     }
 
-    private String readStreamToString(ServletContext servletContext) {
-        BufferedInputStream bis = new BufferedInputStream(servletContext
-                .getResourceAsStream("/WEB-INF/sql/schema.sql"));
+    private String readStreamToString(ServletContext servletContext, String file) {
+        BufferedInputStream bis = new BufferedInputStream(servletContext.getResourceAsStream(file));
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
 
         try {
@@ -60,7 +63,7 @@ public class DataBaseConnection implements ServletContextListener {
                 result = bis.read();
             }
         } catch(IOException e) {
-            throw new DataSourceIsNotAvailableException("Unable to read the file");
+            throw new DataSourceIsNotAvailableException(String.format("Unable to read the file %s", file));
         }
 
         return buf.toString();
