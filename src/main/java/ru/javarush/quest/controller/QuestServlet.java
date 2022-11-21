@@ -57,12 +57,12 @@ public class QuestServlet extends HttpServlet {
 
         switch (choice.getState()) {
             case WIN:
-                updateSessionAfterFinish(currentSession, mapToFinishedChoice(choice).getText(), true);
+                updateSessionAfterFinish(currentSession, ((FinishedChoiceOutDto) choice).getText(), true);
                 getServletContext().getRequestDispatcher("/win.jsp").forward(req, resp);
                 break;
             case FAILURE:
                 req.setAttribute("questId", extractQuest(currentSession).getId());
-                updateSessionAfterFinish(currentSession, mapToFinishedChoice(choice).getText(), false);
+                updateSessionAfterFinish(currentSession, ((FinishedChoiceOutDto) choice).getText(), false);
                 getServletContext().getRequestDispatcher("/failure.jsp").forward(req, resp);
                 break;
             case CONTINUE:
@@ -90,10 +90,6 @@ public class QuestServlet extends HttpServlet {
                 .findFirst()
                 .orElseThrow(() -> new ChoiceNotFoundException(String.format("The choice with id=%s didn't found",
                         choiceId)));
-    }
-
-    private FinishedChoiceOutDto mapToFinishedChoice(ChoiceOutDto choice) {
-        return (FinishedChoiceOutDto) choice;
     }
 
     private StepOutDto extractCurrentStep(HttpSession currentSession) {
