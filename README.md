@@ -30,5 +30,4 @@ Use simple setup of the H2 database in Intellij IDEA like this:
 
 <img width="734" alt="Снимок экрана 2022-11-21 в 18 28 26" src="https://user-images.githubusercontent.com/96682553/203095800-2b7c649f-df63-4ef5-8f05-03495e9c570f.png">
 
-
 <hr>
