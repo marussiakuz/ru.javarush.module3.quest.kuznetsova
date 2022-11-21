@@ -1,8 +1,8 @@
-# <h1 align="center">Quest</h1>
+# <h1 align="center">TestQuest</h1>
 
 ## Description:
 
-Servlet project for creating and completing quests
+Servlet project for creating and completing test quests
 
 <hr>
 
@@ -17,28 +17,18 @@ Servlet project for creating and completing quests
 
 ## It's planned to add the following features soon:
 
-- [] sign in/sign up capability, personal account of the registered user
-- [] the ability to add own quest and get statistic for completing it other users in personal account: CRUD operation with it
-- [] control panel for admin
+- [ ] add JaCoCo + supplement tests for Servlets and Repositories
+- [ ] add error handler filter
+- [ ] sign in/sign up capability, personal account of the registered user
+- [ ] the ability to add own quest and get statistic for completing it other users in personal account: CRUD operation with it
+- [ ] control panel for admin
 
 
 
 ## Want to try this project in action? ##
-Use simple setup of the H2 database in Intellij IDEA:
+Use simple setup of the H2 database in Intellij IDEA like this:
 
+<img width="734" alt="Снимок экрана 2022-11-21 в 18 28 26" src="https://user-images.githubusercontent.com/96682553/203095800-2b7c649f-df63-4ef5-8f05-03495e9c570f.png">
 
 
 <hr>
-
-
-
-
-
-
-
-
-
-
-# Quest
-Servlet project for creating and completing quests
-
