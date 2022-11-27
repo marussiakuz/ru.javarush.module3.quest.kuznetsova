@@ -5,7 +5,7 @@ import ru.javarush.quest.exception.ChoiceContentException;
 import ru.javarush.quest.exception.ChoiceNotFoundException;
 import ru.javarush.quest.exception.SessionInvalidException;
 import ru.javarush.quest.model.dto.*;
-import ru.javarush.quest.service.IQuestService;
+import ru.javarush.quest.service.QuestService;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -19,7 +19,12 @@ import java.util.Objects;
 public class QuestServlet extends HttpServlet {
 
     @Inject
-    private IQuestService questService;
+    private QuestService questService;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -34,11 +39,11 @@ public class QuestServlet extends HttpServlet {
     }
 
     private void startQuest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getSession().setAttribute("isStart", false);
+        HttpSession currentSession = req.getSession();
+
+        currentSession.setAttribute("isStart", false);
 
         long questId = Long.parseLong(req.getPathInfo().split("/")[1]);
-
-        HttpSession currentSession = req.getSession();
 
         StepOutDto startStep = questService.getStartStepByQuestId(questId);
         QuestOutDto quest = questService.getQuestById(questId);
@@ -95,7 +100,7 @@ public class QuestServlet extends HttpServlet {
     private StepOutDto extractCurrentStep(HttpSession currentSession) {
         Object fieldAttribute = currentSession.getAttribute("currentStep");
 
-        if (StepOutDto.class != fieldAttribute.getClass()) {
+        if (fieldAttribute == null || StepOutDto.class != fieldAttribute.getClass()) {
             currentSession.invalidate();
             throw new SessionInvalidException("Session is broken, try one more time");
         }

@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.javarush.quest.model.dto.UserShortDto;
-import ru.javarush.quest.service.UserService;
+import ru.javarush.quest.service.impl.UserServiceImpl;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +26,7 @@ class UserServletTest {
     @Mock
     private HttpSession session;
     @Mock
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
     @InjectMocks
     private UserServlet userServlet;
 
@@ -45,7 +45,7 @@ class UserServletTest {
                 .thenReturn("0.0.0.127.123.55");
 
         Mockito
-                .when(userService.addUser(Mockito.anyString(), Mockito.anyString()))
+                .when(userServiceImpl.addUser(Mockito.anyString(), Mockito.anyString()))
                 .thenCallRealMethod();
 
         userServlet.doPost(req, resp);
@@ -54,7 +54,7 @@ class UserServletTest {
     @Test
     void whenDoPostThenCallAddUserWithNameAndIpParam() {
         Mockito
-                .verify(userService, Mockito.times(1))
+                .verify(userServiceImpl, Mockito.times(1))
                 .addUser("JavaRush", "0.0.0.127.123.55");
     }
 

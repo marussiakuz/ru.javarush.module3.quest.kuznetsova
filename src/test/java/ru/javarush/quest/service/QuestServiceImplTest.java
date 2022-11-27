@@ -12,7 +12,8 @@ import ru.javarush.quest.exception.QuestNotFoundException;
 import ru.javarush.quest.exception.StepNotFoundException;
 import ru.javarush.quest.model.dto.*;
 import ru.javarush.quest.model.enums.State;
-import ru.javarush.quest.repository.IQuestRepository;
+import ru.javarush.quest.repository.QuestRepository;
+import ru.javarush.quest.service.impl.QuestServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +22,13 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class QuestServiceTest {
+class QuestServiceImplTest {
 
     @Mock
-    private IQuestRepository questRepository;
+    private QuestRepository questRepository;
 
     @InjectMocks
-    private QuestService questService;
+    private QuestServiceImpl questServiceImpl;
 
     private QuestOutDto quest;
     private StepOutDto step;
@@ -69,7 +70,7 @@ class QuestServiceTest {
                 .when(questRepository.getQuests())
                 .thenReturn(List.of(quest));
 
-        List<QuestOutDto> quests = questService.getQuests();
+        List<QuestOutDto> quests = questServiceImpl.getQuests();
 
         Assertions.assertNotNull(quests);
         assertEquals(1, quests.size());
@@ -85,7 +86,7 @@ class QuestServiceTest {
                 .when(questRepository.getQuests())
                 .thenReturn(new ArrayList<>());
 
-        List<QuestOutDto> quests = questService.getQuests();
+        List<QuestOutDto> quests = questServiceImpl.getQuests();
 
         Assertions.assertNotNull(quests);
         assertTrue(quests.isEmpty());
@@ -104,7 +105,7 @@ class QuestServiceTest {
                 .when(questRepository.getChoicesByStepId(18))
                 .thenReturn(List.of(choiceWin, choiceHasNextStep));
 
-        StepOutDto returned = questService.getStartStepByQuestId(5);
+        StepOutDto returned = questServiceImpl.getStartStepByQuestId(5);
 
         Assertions.assertNotNull(returned);
         assertEquals(List.of(choiceWin, choiceHasNextStep), returned.getChoices());
@@ -129,7 +130,7 @@ class QuestServiceTest {
 
         final StepNotFoundException exception = Assertions.assertThrows(
                 StepNotFoundException.class,
-                () -> questService.getStartStepByQuestId(5));
+                () -> questServiceImpl.getStartStepByQuestId(5));
 
         Assertions.assertEquals("start step of quest with id=5 has no any choices", exception.getMessage());
 
@@ -147,7 +148,7 @@ class QuestServiceTest {
 
         final StepNotFoundException exception = Assertions.assertThrows(
                 StepNotFoundException.class,
-                () -> questService.getStartStepByQuestId(5));
+                () -> questServiceImpl.getStartStepByQuestId(5));
 
         Assertions.assertEquals("start step of quest with id=5 not found", exception.getMessage());
 
@@ -163,7 +164,7 @@ class QuestServiceTest {
                 .when(questRepository.getQuestById(11))
                 .thenReturn(Optional.of(quest));
 
-        QuestOutDto returnedQuest = questService.getQuestById(11);
+        QuestOutDto returnedQuest = questServiceImpl.getQuestById(11);
 
         Assertions.assertNotNull(returnedQuest);
         assertEquals(quest, returnedQuest);
@@ -180,7 +181,7 @@ class QuestServiceTest {
 
         QuestNotFoundException exception = Assertions.assertThrows(
                 QuestNotFoundException.class,
-                () -> questService.getQuestById(3));
+                () -> questServiceImpl.getQuestById(3));
 
         Assertions.assertEquals("quest with id=3 not found", exception.getMessage());
 
@@ -198,7 +199,7 @@ class QuestServiceTest {
                 .when(questRepository.getChoicesByStepId(18))
                 .thenReturn(List.of(choiceWin, choiceHasNextStep));
 
-        StepOutDto returned = questService.getStepById(18);
+        StepOutDto returned = questServiceImpl.getStepById(18);
 
         Assertions.assertNotNull(returned);
         assertEquals(List.of(choiceWin, choiceHasNextStep), returned.getChoices());
@@ -223,7 +224,7 @@ class QuestServiceTest {
 
         final StepNotFoundException exception = Assertions.assertThrows(
                 StepNotFoundException.class,
-                () -> questService.getStepById(18));
+                () -> questServiceImpl.getStepById(18));
 
         Assertions.assertEquals("step with id=18 has no any choices", exception.getMessage());
 
@@ -241,7 +242,7 @@ class QuestServiceTest {
 
         final StepNotFoundException exception = Assertions.assertThrows(
                 StepNotFoundException.class,
-                () -> questService.getStepById(18));
+                () -> questServiceImpl.getStepById(18));
 
         Assertions.assertEquals("step with id=18 not found", exception.getMessage());
 

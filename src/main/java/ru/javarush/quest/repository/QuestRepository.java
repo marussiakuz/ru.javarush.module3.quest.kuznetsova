@@ -7,7 +7,7 @@ import ru.javarush.quest.model.dto.StepOutDto;
 import java.util.List;
 import java.util.Optional;
 
-public interface IQuestRepository {
+public interface QuestRepository {
 
     List<QuestOutDto> getQuests();
 

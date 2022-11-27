@@ -7,6 +7,5 @@ public class ChoiceContentException extends RuntimeException {
 
     public ChoiceContentException(String message) {
         super(message);
-        log.error(message);
     }
 }

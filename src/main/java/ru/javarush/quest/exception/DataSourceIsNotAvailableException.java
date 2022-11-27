@@ -7,6 +7,5 @@ public class DataSourceIsNotAvailableException extends RuntimeException {
 
     public DataSourceIsNotAvailableException(String message) {
         super(message);
-        log.error(message);
     }
 }

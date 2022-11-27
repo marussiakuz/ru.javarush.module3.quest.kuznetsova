@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ManagedBean
-public class QuestDbRepository implements IQuestRepository {
+public class QuestDbRepository implements QuestRepository {
 
     @Inject
     private DataBaseConnection dataBaseConnection;
@@ -24,9 +24,8 @@ public class QuestDbRepository implements IQuestRepository {
 
         List<QuestOutDto> quests = new ArrayList<>();
 
-        try {
-            Connection connection = dataBaseConnection.getDataSource().getConnection();
-            Statement statement = connection.createStatement();
+        try (Connection connection = dataBaseConnection.getDataSource().getConnection();
+             Statement statement = connection.createStatement()) {
             ResultSet rs = statement.executeQuery(query);
 
             while (rs.next()) {
@@ -38,10 +37,9 @@ public class QuestDbRepository implements IQuestRepository {
                         .build();
                 quests.add(quest);
             }
-
-            connection.close();
         } catch (SQLException e) {
-            throw new DataSourceIsNotAvailableException("an unknown error occurred while trying to get a list of quests");
+            throw new DataSourceIsNotAvailableException(String.format("an unknown error occurred while trying to get " +
+                    "a list of quests: %s", e.getMessage()));
         }
 
         return quests;
@@ -49,16 +47,16 @@ public class QuestDbRepository implements IQuestRepository {
 
     @Override
     public Optional<QuestOutDto> getQuestById(long id) {
-        PreparedStatement preparedStatement;
+        String query = "select * from quest where quest_id = ?";
+
         Optional<QuestOutDto> questOptional = Optional.empty();
 
-        try {
-            Connection connection = dataBaseConnection.getDataSource().getConnection();
-            preparedStatement = connection.prepareStatement("select * from quest where quest_id = ?");
+        try (Connection connection = dataBaseConnection.getDataSource().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setLong(1, id);
             ResultSet rs = preparedStatement.executeQuery();
 
-            while (rs.next()) {
+            if (rs.next()) {
                 questOptional = Optional.of(
                         QuestOutDto.builder()
                                 .id(rs.getLong("quest_id"))
@@ -68,8 +66,6 @@ public class QuestDbRepository implements IQuestRepository {
                                 .build()
                 );
             }
-
-            connection.close();
         } catch (SQLException e) {
             throw new DataSourceIsNotAvailableException(String.format("an unknown error occurred while trying to get " +
                     "quest id=%s", id));
@@ -80,17 +76,15 @@ public class QuestDbRepository implements IQuestRepository {
 
     @Override
     public Optional<StepOutDto> getStartStepByQuestId(long questId) {
-        PreparedStatement preparedStatement;
+        String query = "select step_id, question from step where is_start = true and quest_id = ?";
         Optional<StepOutDto> stepOptional = Optional.empty();
 
-        try {
-            Connection connection = dataBaseConnection.getDataSource().getConnection();
-            preparedStatement = connection.prepareStatement("select step_id, question from step where is_start = " +
-                    "true and quest_id = ?");
+        try (Connection connection = dataBaseConnection.getDataSource().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setLong(1, questId);
             ResultSet rs = preparedStatement.executeQuery();
 
-            while (rs.next()) {
+            if (rs.next()) {
                 stepOptional = Optional.of(
                         StepOutDto.builder()
                                 .id(rs.getLong("step_id"))
@@ -98,8 +92,6 @@ public class QuestDbRepository implements IQuestRepository {
                                 .build()
                 );
             }
-
-            connection.close();
         } catch (SQLException e) {
             throw new DataSourceIsNotAvailableException(String.format("an unknown error occurred while trying to get " +
                     "start step by questId=%s", questId));
@@ -110,22 +102,19 @@ public class QuestDbRepository implements IQuestRepository {
 
     @Override
     public List<ChoiceOutDto> getChoicesByStepId(long stepId) {
-        PreparedStatement preparedStatement;
+        String query = "select choice.choice_id, answer, state, to_be_continue.next_step_id, the_end.text from choice " +
+                "left join to_be_continue using (choice_id) left join the_end using (choice_id) where " +
+                "current_step_id = ?";
         List<ChoiceOutDto> choices = new ArrayList<>();
 
-        try {
-            Connection connection = dataBaseConnection.getDataSource().getConnection();
-            preparedStatement = connection.prepareStatement("select choice.choice_id, answer, state, " +
-                    "to_be_continue.next_step_id, the_end.text from choice left join to_be_continue using (choice_id) " +
-                    "left join the_end using (choice_id) where current_step_id = ?");
+        try (Connection connection = dataBaseConnection.getDataSource().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setLong(1, stepId);
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
                 choices.add(mapToChoiceOutDto(rs));
             }
-
-            connection.close();
         } catch (SQLException e) {
             throw new DataSourceIsNotAvailableException(String.format("an unknown error occurred while trying to get " +
                     "a list of choices for the step with id=%s", stepId));
@@ -136,16 +125,15 @@ public class QuestDbRepository implements IQuestRepository {
 
     @Override
     public Optional<StepOutDto> getStepById(long id) {
-        PreparedStatement preparedStatement;
+        String query = "select step_id, question from step where step_id = ?";
         Optional<StepOutDto> stepOptional = Optional.empty();
 
-        try {
-            Connection connection = dataBaseConnection.getDataSource().getConnection();
-            preparedStatement = connection.prepareStatement("select step_id, question from step where step_id = ?");
+        try (Connection connection = dataBaseConnection.getDataSource().getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setLong(1, id);
             ResultSet rs = preparedStatement.executeQuery();
 
-            while (rs.next()) {
+            if (rs.next()) {
                 stepOptional = Optional.of(
                         StepOutDto.builder()
                                 .id(rs.getLong("step_id"))
@@ -153,10 +141,7 @@ public class QuestDbRepository implements IQuestRepository {
                                 .build()
                 );
             }
-
-            connection.close();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new DataSourceIsNotAvailableException(String.format("an unknown error occurred while trying to get " +
                     "step by id=%s", id));
         }
