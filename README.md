@@ -23,7 +23,7 @@ Servlet project for creating and completing test quests
 
 ## It's planned to add the following features soon:
 
-- [ ] add JaCoCo + supplement tests for Servlets and Repositories
+- [X] add JaCoCo + supplement tests for Servlets and Repositories
 - [ ] add error handler filter
 - [ ] sign in/sign up capability, personal account of the registered user
 - [ ] the ability to add own quest and get statistic for completing it other users in personal account: CRUD operation with it
