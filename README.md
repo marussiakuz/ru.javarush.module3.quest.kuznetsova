@@ -8,7 +8,7 @@ Servlet project for creating and completing test quests
 
 ## Short view:
 
-<img width="700" alt="quest gif" src="https://user-images.githubusercontent.com/96682553/204336958-68974975-9d2f-41fa-b0f4-931afa8889ce.gif">
+<img width="700" alt="quest gif" src="https://user-images.githubusercontent.com/96682553/204340032-0ddb0e71-fd0b-4750-b211-6085efddf972.gif">
 
 <hr>
 
