@@ -6,6 +6,12 @@ Servlet project for creating and completing test quests
 
 <hr>
 
+## Short view:
+
+<img width="700" alt="quest gif" src="https://user-images.githubusercontent.com/96682553/204336958-68974975-9d2f-41fa-b0f4-931afa8889ce.gif">
+
+<hr>
+
 ## Tech stacks has been used:
 <br/>:white_check_mark: Servlets API
 <br/>:white_check_mark: JSP, JSTL
