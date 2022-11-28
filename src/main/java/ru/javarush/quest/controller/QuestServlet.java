@@ -22,11 +22,6 @@ public class QuestServlet extends HttpServlet {
     private QuestService questService;
 
     @Override
-    public void init() throws ServletException {
-        super.init();
-    }
-
-    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (req.getParameter("choice") != null) makeStep(req, resp);
 
@@ -111,7 +106,7 @@ public class QuestServlet extends HttpServlet {
     private QuestOutDto extractQuest(HttpSession currentSession) {
         Object fieldAttribute = currentSession.getAttribute("currentQuest");
 
-        if (QuestOutDto.class != fieldAttribute.getClass()) {
+        if (fieldAttribute == null || QuestOutDto.class != fieldAttribute.getClass()) {
             currentSession.invalidate();
             throw new SessionInvalidException("Session is broken, try one more time");
         }

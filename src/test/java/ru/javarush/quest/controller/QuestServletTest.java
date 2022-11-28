@@ -1,14 +1,10 @@
 package ru.javarush.quest.controller;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.servlet.RequestDispatcher;
@@ -21,6 +17,8 @@ import javax.servlet.http.HttpSession;
 
 import ru.javarush.quest.exception.ChoiceNotFoundException;
 import ru.javarush.quest.exception.SessionInvalidException;
+import ru.javarush.quest.model.Quest;
+import ru.javarush.quest.model.Step;
 import ru.javarush.quest.model.dto.*;
 import ru.javarush.quest.model.enums.State;
 import ru.javarush.quest.service.QuestService;
@@ -89,6 +87,8 @@ class QuestServletTest {
                 .description("very difficult")
                 .img("/resources/current.ipg")
                 .build();
+
+        step.setChoices(List.of(choiceWin, choiceFailure, choiceHasNextStep));
     }
 
     @Test
@@ -96,8 +96,6 @@ class QuestServletTest {
         Mockito
                 .when(req.getSession())
                 .thenReturn(session);
-
-        step.setChoices(List.of(choiceWin, choiceFailure, choiceHasNextStep));
 
         Mockito
                 .when(req.getParameter("choice"))
@@ -138,7 +136,8 @@ class QuestServletTest {
                 .removeAttribute("currentQuest");
         Mockito.verify(session, Mockito.times(1))
                 .setAttribute("winCount", 16);
-
+        Mockito.verify(session, Mockito.never())
+                .invalidate();
     }
 
     @Test
@@ -146,8 +145,6 @@ class QuestServletTest {
         Mockito
                 .when(req.getSession())
                 .thenReturn(session);
-
-        step.setChoices(List.of(choiceWin, choiceFailure, choiceHasNextStep));
 
         Mockito
                 .when(req.getParameter("choice"))
@@ -192,6 +189,149 @@ class QuestServletTest {
                 .removeAttribute("currentQuest");
         Mockito.verify(session, Mockito.times(1))
                 .setAttribute("failureCount", 11);
+        Mockito.verify(session, Mockito.times(1))
+                .getAttribute("currentQuest");
+        Mockito.verify(session, Mockito.never())
+                .invalidate();
+    }
+
+    @Test
+    void whenDoGetIfCurrentQuestAttributeIsNotQuestOutDtoThenThrowsSessionInvalidException()
+            throws ServletException, IOException {
+        Mockito
+                .when(req.getSession())
+                .thenReturn(session);
+
+        Mockito
+                .when(req.getParameter("choice"))
+                .thenReturn("12");
+
+        Mockito
+                .when(session.getAttribute("currentStep"))
+                .thenReturn(step);
+
+        Mockito
+                .when(session.getAttribute("currentQuest"))
+                .thenReturn(Quest.class);
+
+        SessionInvalidException exception = Assertions.assertThrows(
+                SessionInvalidException.class,
+                () -> questServlet.doGet(req, resp));
+
+        Assertions.assertEquals("Session is broken, try one more time", exception.getMessage());
+
+        Mockito.verify(servletContext, Mockito.never())
+                .getRequestDispatcher("/failure.jsp");
+        Mockito.verify(requestDispatcher, Mockito.never())
+                .forward(req, resp);
+        Mockito.verify(session, Mockito.times(2))
+                .getAttribute(Mockito.anyString());
+        Mockito.verify(session, Mockito.times(1))
+                .invalidate();
+    }
+
+    @Test
+    void whenDoGetIfWinCountNullThenSetOne() throws ServletException, IOException {
+        Mockito
+                .when(req.getSession())
+                .thenReturn(session);
+
+        Mockito
+                .when(req.getParameter("choice"))
+                .thenReturn("11");
+
+        Mockito
+                .when(session.getAttribute("currentStep"))
+                .thenReturn(step);
+
+        Mockito
+                .when(session.getAttribute("winCount"))
+                .thenReturn(null);
+
+        Mockito
+                .when(servletConfig.getServletContext())
+                .thenReturn(servletContext);
+
+        Mockito
+                .when(servletContext.getRequestDispatcher(Mockito.anyString()))
+                .thenReturn(requestDispatcher);
+
+        doNothing()
+                .when(requestDispatcher).forward(req, resp);
+
+        questServlet.doGet(req, resp);
+
+        Mockito.verify(servletContext, Mockito.times(1))
+                .getRequestDispatcher("/win.jsp");
+        Mockito.verify(requestDispatcher, Mockito.times(1))
+                .forward(req, resp);
+        Mockito.verify(session, Mockito.times(1))
+                .setAttribute("countOfStep", 0);
+        Mockito.verify(session, Mockito.times(1))
+                .setAttribute("text", "Congratulations, you are cat!");
+        Mockito.verify(session, Mockito.times(1))
+                .removeAttribute("currentStep");
+        Mockito.verify(session, Mockito.times(1))
+                .removeAttribute("currentQuest");
+        Mockito.verify(session, Mockito.times(1))
+                .setAttribute("winCount", 1);
+        Mockito.verify(session, Mockito.never())
+                .invalidate();
+    }
+
+    @Test
+    void whenDoGetIfFailureCountNullThenSetOne() throws ServletException, IOException {
+        Mockito
+                .when(req.getSession())
+                .thenReturn(session);
+
+        Mockito
+                .when(req.getParameter("choice"))
+                .thenReturn("12");
+
+        Mockito
+                .when(session.getAttribute("currentStep"))
+                .thenReturn(step);
+
+        Mockito
+                .when(session.getAttribute("currentQuest"))
+                .thenReturn(quest);
+
+        Mockito
+                .when(session.getAttribute("failureCount"))
+                .thenReturn(null);
+
+        Mockito
+                .when(servletConfig.getServletContext())
+                .thenReturn(servletContext);
+
+        Mockito
+                .when(servletContext.getRequestDispatcher(Mockito.anyString()))
+                .thenReturn(requestDispatcher);
+
+        doNothing()
+                .when(requestDispatcher).forward(req, resp);
+
+        questServlet.doGet(req, resp);
+
+        Mockito.verify(servletContext, Mockito.times(1))
+                .getRequestDispatcher("/failure.jsp");
+        Mockito.verify(requestDispatcher, Mockito.times(1))
+                .forward(req, resp);
+        Mockito.verify(session, Mockito.times(1))
+                .setAttribute("countOfStep", 0);
+        Mockito.verify(session, Mockito.times(1))
+                .setAttribute("text", "Sad news, you've been eaten..");
+        Mockito.verify(session, Mockito.times(1))
+                .removeAttribute("currentStep");
+        Mockito.verify(session, Mockito.times(1))
+                .removeAttribute("currentQuest");
+        Mockito.verify(session, Mockito.times(1))
+                .setAttribute("failureCount", 1);
+        Mockito.verify(session, Mockito.times(1))
+                .getAttribute("currentQuest");
+        Mockito.verify(session, Mockito.never())
+                .invalidate();
     }
 
     @Test
@@ -200,7 +340,6 @@ class QuestServletTest {
                 .when(req.getSession())
                 .thenReturn(session);
 
-        step.setChoices(List.of(choiceWin, choiceFailure, choiceHasNextStep));
         StepOutDto nextStep = StepOutDto.builder().build();
 
         Mockito
@@ -240,17 +379,66 @@ class QuestServletTest {
                 .setAttribute("currentStep", nextStep);
         Mockito.verify(session, Mockito.times(1))
                 .setAttribute("countOfStep", 2);
+        Mockito.verify(session, Mockito.never())
+                .invalidate();
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"11", "12", "13"})
-    void whenDoGetIfRequestHasChoiceParamAndCurrentStepIsNotStepOutDtoThenThrowsSessionInvalidException(String choiceId)
-            throws ServletException, IOException {
+    @Test
+    void whenDoGetIfCountOfStepNullThenSetOne() throws ServletException, IOException {
         Mockito
                 .when(req.getSession())
                 .thenReturn(session);
 
-        step.setChoices(List.of(choiceWin, choiceFailure, choiceHasNextStep));
+        StepOutDto nextStep = StepOutDto.builder().build();
+
+        Mockito
+                .when(req.getParameter("choice"))
+                .thenReturn("13");
+
+        Mockito
+                .when(session.getAttribute("currentStep"))
+                .thenReturn(step);
+
+        Mockito
+                .when(questService.getStepById(22))
+                .thenReturn(nextStep);
+
+        Mockito
+                .when(session.getAttribute("countOfStep"))
+                .thenReturn(null);
+
+        Mockito
+                .when(servletConfig.getServletContext())
+                .thenReturn(servletContext);
+
+        Mockito
+                .when(servletContext.getRequestDispatcher(Mockito.anyString()))
+                .thenReturn(requestDispatcher);
+
+        doNothing()
+                .when(requestDispatcher).forward(req, resp);
+
+        questServlet.doGet(req, resp);
+
+        Mockito.verify(servletContext, Mockito.times(1))
+                .getRequestDispatcher("/game.jsp");
+        Mockito.verify(requestDispatcher, Mockito.times(1))
+                .forward(req, resp);
+        Mockito.verify(session, Mockito.times(1))
+                .setAttribute("currentStep", nextStep);
+        Mockito.verify(session, Mockito.times(1))
+                .setAttribute("countOfStep", 1);
+        Mockito.verify(session, Mockito.never())
+                .invalidate();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"11", "12", "13"})
+    void whenDoGetIfCurrentStepIsNotStepOutDtoThenThrowsSessionInvalidException(String choiceId)
+            throws ServletException, IOException {
+        Mockito
+                .when(req.getSession())
+                .thenReturn(session);
 
         Mockito
                 .when(req.getParameter("choice"))
@@ -258,7 +446,7 @@ class QuestServletTest {
 
         Mockito
                 .when(session.getAttribute("currentStep"))
-                .thenReturn(new Object());
+                .thenReturn(Step.class);
 
         final SessionInvalidException exception = Assertions.assertThrows(
                 SessionInvalidException.class, () -> questServlet.doGet(req, resp)
@@ -270,17 +458,17 @@ class QuestServletTest {
                 .getRequestDispatcher(Mockito.anyString());
         Mockito.verify(requestDispatcher, Mockito.never())
                 .forward(req, resp);
+        Mockito.verify(session, Mockito.times(1))
+                .invalidate();
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"11", "12", "13"})
-    void whenDoGetIfRequestHasChoiceParamAndSessionHasNotCurrentStepThenThrowsSessionInvalidException(String choiceId)
+    void whenDoGetIfCurrentStepIsNullThenThrowsSessionInvalidException(String choiceId)
             throws ServletException, IOException {
         Mockito
                 .when(req.getSession())
                 .thenReturn(session);
-
-        step.setChoices(List.of(choiceWin, choiceFailure, choiceHasNextStep));
 
         Mockito
                 .when(req.getParameter("choice"))
@@ -300,16 +488,82 @@ class QuestServletTest {
                 .getRequestDispatcher(Mockito.anyString());
         Mockito.verify(requestDispatcher, Mockito.never())
                 .forward(req, resp);
+        Mockito.verify(session, Mockito.times(1))
+                .invalidate();
     }
 
     @Test
-    void whenDoGetIfRequestHasChoiceParamAndChoiceNotExistsThenThrows()
+    void whenDoGetIfCurrentQuestIsNotStepOutDtoThenThrowsSessionInvalidException()
             throws ServletException, IOException {
         Mockito
                 .when(req.getSession())
                 .thenReturn(session);
 
-        step.setChoices(List.of(choiceWin, choiceFailure, choiceHasNextStep));
+        Mockito
+                .when(req.getParameter("choice"))
+                .thenReturn("12");
+
+        Mockito
+                .when(session.getAttribute("currentStep"))
+                .thenReturn(step);
+
+        Mockito
+                .when(session.getAttribute("currentQuest"))
+                .thenReturn(Quest.class);
+
+        final SessionInvalidException exception = Assertions.assertThrows(
+                SessionInvalidException.class, () -> questServlet.doGet(req, resp)
+        );
+
+        Assertions.assertEquals("Session is broken, try one more time", exception.getMessage());
+
+        Mockito.verify(servletContext, Mockito.never())
+                .getRequestDispatcher(Mockito.anyString());
+        Mockito.verify(requestDispatcher, Mockito.never())
+                .forward(req, resp);
+        Mockito.verify(session, Mockito.times(1))
+                .invalidate();
+    }
+
+    @Test
+    void whenDoGetIfCurrentQuestIsNullThenThrowsSessionInvalidException()
+            throws ServletException, IOException {
+        Mockito
+                .when(req.getSession())
+                .thenReturn(session);
+
+        Mockito
+                .when(req.getParameter("choice"))
+                .thenReturn("12");
+
+        Mockito
+                .when(session.getAttribute("currentStep"))
+                .thenReturn(step);
+
+        Mockito
+                .when(session.getAttribute("currentQuest"))
+                .thenReturn(null);
+
+        final SessionInvalidException exception = Assertions.assertThrows(
+                SessionInvalidException.class, () -> questServlet.doGet(req, resp)
+        );
+
+        Assertions.assertEquals("Session is broken, try one more time", exception.getMessage());
+
+        Mockito.verify(servletContext, Mockito.never())
+                .getRequestDispatcher(Mockito.anyString());
+        Mockito.verify(requestDispatcher, Mockito.never())
+                .forward(req, resp);
+        Mockito.verify(session, Mockito.times(1))
+                .invalidate();
+    }
+
+    @Test
+    void whenDoGetIfRequestHasChoiceParamAndChoiceNotExistsThenThrowsChoiceNotFoundException()
+            throws ServletException, IOException {
+        Mockito
+                .when(req.getSession())
+                .thenReturn(session);
 
         Mockito
                 .when(req.getParameter("choice"))
