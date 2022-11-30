@@ -15,6 +15,7 @@ public class QuestFilter implements Filter{
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         String choiceParameter = servletRequest.getParameter("choice");
+
         if (choiceParameter != null && isNotLong(choiceParameter)) {
             throw new UrlParameterInvalidException(String.format("param choice must be long value, but is %s",
                     choiceParameter));

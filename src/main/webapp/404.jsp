@@ -1,7 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title>404</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -20,14 +21,20 @@
             -o-background-size: cover;
             background-size: cover;
         }
+        h2 {
+            align-content: center;
+        }
+        div {
+            align-content: center;
+        }
     </style>
 </head>
-
+<body>
 
 <br>
 <br>
-<h2 align="center" class="h5 text-center">Here may have been such a page, but it's no longer here..</h2>
-<div align="center">
+<h2 class="h5 text-center">Here may have been such a page, but it's no longer here..</h2>
+<div >
     <a href="./welcome.jsp">Go back home</a>
 </div>
 

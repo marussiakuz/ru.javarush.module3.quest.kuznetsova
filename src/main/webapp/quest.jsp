@@ -27,7 +27,7 @@
 
 <div class="row d-flex justify-content-center">
     <div class="col-md-6">
-        <h3 class="text-muted" align="center">Quests</h3>
+        <h3 class="text-muted" >Quests</h3>
         <ul class="list-group">
             <c:forEach items="${quests}" var="quest" varStatus="status">
                 <a onclick="go_to_quest(${quest.id})" href="#" class="${status.index % 2 == 0? 'list-group-item list-group-item-action active' : 'list-group-item list-group-item-action'}" aria-current=true>
@@ -58,13 +58,13 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p><b>Name:</b> ${userInfo.name}</p>
-                <p><b>IP address:</b> ${userInfo.ip}</p>
-                <p><b>Quests finished:</b> ${isStart ? 0 : failureCount + winCount}</p>
-                <p><b>Won:</b> ${isStart ? 0 : winCount}</p>
-                <p><b>Lost:</b> ${isStart ? 0 : failureCount}</p>
-                <p><b>Current Quest:</b> ${isStart || countOfStep == 0 ? 'any quest hasn\'t been selected yet' : currentQuest.name} </p>
-                <p><b>Current Step:</b> ${isStart || countOfStep == 0 ? 'no quest has been started yet' : countOfStep}</p>
+                <p><strong>Name:</strong> ${userInfo.name}</p>
+                <p><strong>IP address:</strong> ${userInfo.ip}</p>
+                <p><strong>Quests finished:</strong> ${isStart ? 0 : failureCount + winCount}</p>
+                <p><strong>Won:</strong> ${isStart ? 0 : winCount}</p>
+                <p><strong>Lost:</strong> ${isStart ? 0 : failureCount}</p>
+                <p><strong>Current Quest:</strong> ${isStart || countOfStep == 0 ? 'any quest hasn\'t been selected yet' : currentQuest.name} </p>
+                <p><strong>Current Step:</strong> ${isStart || countOfStep == 0 ? 'no quest has been started yet' : countOfStep}</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
@@ -76,6 +76,10 @@
 <style>
     .modal {
         background-color: white;
+    }
+
+    h3, h5 {
+        text-align: center;
     }
 </style>
 

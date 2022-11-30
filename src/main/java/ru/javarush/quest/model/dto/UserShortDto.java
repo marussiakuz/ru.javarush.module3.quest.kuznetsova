@@ -9,6 +9,7 @@ import java.io.Serializable;
 @Data
 public class UserShortDto implements Serializable {
 
+    private Long id;
     private String name;
     private String ip;
 }

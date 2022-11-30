@@ -31,6 +31,9 @@
             -o-background-size: cover;
             background-size: cover;
         }
+        h1, h2 {
+            align-content: center;
+        }
     </style>
 </head>
 
@@ -38,8 +41,8 @@
 <jsp:useBean id="text" scope="session" type="java.lang.String"/>
 <jsp:useBean id="questId" scope="request" type="java.lang.Long"/>
 <div class="content">
-    <h1 align="center" class="h4 text-center mt-0 mb-4">${text}</h1>
-    <h2 align="center" class="h5 text-center">You are looser!</h2>
+    <h1 class="h4 text-center mt-0 mb-4">${text}</h1>
+    <h2 class="h5 text-center">You are looser!</h2>
 </div>
 <div class="d-grid gap-2 d-md-flex justify-content-md-end"  style="position:fixed;bottom:5px;right:5px;margin:0;padding:5px 3px;">
     <button onclick="window.location='/quest/${questId}'" type="button" class="btn btn-primary">Try again</button>

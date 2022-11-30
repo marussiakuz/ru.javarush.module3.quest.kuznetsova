@@ -25,7 +25,7 @@
             </div>
             <div class="modal-body">
                 <div class="col-xs-3 col-xs-offset-5">
-                    <div id="loadbar" style="display: none;">
+                    <div id="loader" style="display: none;">
                         <div class="blockG" id="rotateG_01"></div>
                         <div class="blockG" id="rotateG_02"></div>
                         <div class="blockG" id="rotateG_03"></div>
@@ -39,7 +39,9 @@
 
                 <div class="quiz" id="quiz" data-toggle="buttons">
                     <c:forEach items="${currentStep.choices}" var="choice" varStatus="status">
-                    <label onclick="window.location='/quest/${currentQuest.id}?choice=${choice.id}'" class="element-animation${status.count} btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value=${choice.id}> ${choice.answer}</label>
+                    <label onclick="window.location='/quest/${currentQuest.id}?choice=${choice.id}'" class="element-animation${status.count} btn btn-lg btn-primary btn-block">
+                        <span class="btn-label"><em class="glyphicon glyphicon-chevron-right"></em></span>
+                        <input type="radio" name="q_answer" value=${choice.id}> ${choice.answer}</label>
                     </c:forEach>
                 </div>
             </div>
@@ -63,13 +65,13 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p><b>Name:</b> ${userInfo.name}</p>
-                <p><b>IP address:</b> ${userInfo.ip}</p>
-                <p><b>Quests finished:</b> ${failureCount + winCount}</p>
-                <p><b>Won:</b> ${winCount}</p>
-                <p><b>Lost:</b> ${failureCount}</p>
-                <p><b>Current Quest:</b> ${currentQuest.name} </p>
-                <p><b>Current Step:</b> ${countOfStep}</p>
+                <p><strong>Name:</strong> ${userInfo.name}</p>
+                <p><strong>IP address:</strong> ${userInfo.ip}</p>
+                <p><strong>Quests finished:</strong> ${failureCount + winCount}</p>
+                <p><strong>Won:</strong> ${winCount}</p>
+                <p><strong>Lost:</strong> ${failureCount}</p>
+                <p><strong>Current Quest:</strong> ${currentQuest.name} </p>
+                <p><strong>Current Step:</strong> ${countOfStep}</p>
             </div>
             <div class="modal-footer">
 
@@ -122,6 +124,7 @@
     label .glyphicon {
         top: 34%
     }
+    /* used in the foreach loop */
     .element-animation1 {
         animation: animationFrames ease .8s;
         animation-iteration-count: 1;
@@ -213,7 +216,7 @@
     .modal-body {
         min-height: 205px
     }
-    #loadbar {
+    #loader {
         position: absolute;
         width: 62px;
         height: 77px;
