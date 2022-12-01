@@ -53,7 +53,8 @@ class QuestFilterTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "", "word", "\t", "\n", "2.5", "9999999999999999999999999999999999999999999999999999999" })
-    void doFilterIfParameterChoiceIsNotLongThenThrowsUrlParameterInvalidException(String value) throws ServletException, IOException {
+    void doFilterIfParameterChoiceIsNotLongThenThrowsUrlParameterInvalidException(String value)
+            throws ServletException, IOException {
         Mockito
                 .when(servletRequest.getParameter("choice"))
                 .thenReturn(value);
