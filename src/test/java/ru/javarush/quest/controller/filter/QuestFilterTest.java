@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -29,26 +30,42 @@ class QuestFilterTest {
     @Mock
     private FilterChain filterChain;
 
-    @Test
-    void doFilterIfParameterChoiceAndPathVariableQuestIdAreLongThenCallDoFilter() throws ServletException, IOException {
-        setChoiceParamAndPathInfo("11", "quest/20");
-
-        Mockito
-                .doNothing().when(filterChain).doFilter(servletRequest, servletResponse);
+    @ParameterizedTest
+    @CsvSource({"11, quest/20, 2", "11, , 1", " , quest/20, 2", " , , 1"})
+    void doFilterIfParameterChoiceAndPathVariableQuestIdAreLongOrNullThenCallDoFilter(String choiceParam,
+                                                                                      String pathInfo, int count)
+            throws ServletException, IOException {
+        setChoiceParamAndPathInfo(choiceParam, pathInfo);
 
         questFilter.doFilter(servletRequest, servletResponse, filterChain);
 
         Mockito
                 .verify(servletRequest, Mockito.times(1))
                 .getParameter("choice");
-
         Mockito
-                .verify(servletRequest, Mockito.times(2))
+                .verify(servletRequest, Mockito.times(count))
                 .getPathInfo();
-
         Mockito
                 .verify(filterChain, Mockito.times(1))
                 .doFilter(servletRequest, servletResponse);
+    }
+
+    @Test
+    void doFilterIfServletRequestIsNotHttpThenGetPathInfoOnceAndCallDoFilter() throws ServletException, IOException {
+        ServletRequest servletRequestIsNotHttp = Mockito.mock(ServletRequest.class);
+
+        Mockito
+                .when(servletRequestIsNotHttp.getParameter("choice"))
+                .thenReturn("11");
+
+        questFilter.doFilter(servletRequestIsNotHttp, servletResponse, filterChain);
+
+        Mockito
+                .verify(servletRequestIsNotHttp, Mockito.times(1))
+                .getParameter("choice");
+        Mockito
+                .verify(filterChain, Mockito.times(1))
+                .doFilter(servletRequestIsNotHttp, servletResponse);
     }
 
     @ParameterizedTest
@@ -69,59 +86,11 @@ class QuestFilterTest {
         Mockito
                 .verify(servletRequest, Mockito.times(1))
                 .getParameter("choice");
-
         Mockito
                 .verify(servletRequest, Mockito.never())
                 .getPathInfo();
-
         Mockito
                 .verify(filterChain, Mockito.never())
-                .doFilter(servletRequest, servletResponse);
-    }
-
-    @Test
-    void doFilterIfParameterChoiceIsNullAndPathVariableQuestIdIsLongThenCallDoFilter() throws ServletException,
-            IOException {
-        setChoiceParamAndPathInfo(null, "quest/20");
-
-        Mockito
-                .doNothing().when(filterChain).doFilter(servletRequest, servletResponse);
-
-        questFilter.doFilter(servletRequest, servletResponse, filterChain);
-
-        Mockito
-                .verify(servletRequest, Mockito.times(1))
-                .getParameter("choice");
-
-        Mockito
-                .verify(servletRequest, Mockito.times(2))
-                .getPathInfo();
-
-        Mockito
-                .verify(filterChain, Mockito.times(1))
-                .doFilter(servletRequest, servletResponse);
-    }
-
-    @Test
-    void doFilterIfParameterChoiceAndPathVariableQuestIdBothAreNullThenCallDoFilter()
-            throws ServletException, IOException {
-        setChoiceParamAndPathInfo(null, null);
-
-        Mockito
-                .doNothing().when(filterChain).doFilter(servletRequest, servletResponse);
-
-        questFilter.doFilter(servletRequest, servletResponse, filterChain);
-
-        Mockito
-                .verify(servletRequest, Mockito.times(1))
-                .getParameter("choice");
-
-        Mockito
-                .verify(servletRequest, Mockito.times(1))
-                .getPathInfo();
-
-        Mockito
-                .verify(filterChain, Mockito.times(1))
                 .doFilter(servletRequest, servletResponse);
     }
 
@@ -141,11 +110,9 @@ class QuestFilterTest {
         Mockito
                 .verify(servletRequest, Mockito.times(1))
                 .getParameter("choice");
-
         Mockito
                 .verify(servletRequest, Mockito.times(2))
                 .getPathInfo();
-
         Mockito
                 .verify(filterChain, Mockito.never())
                 .doFilter(servletRequest, servletResponse);
@@ -166,11 +133,9 @@ class QuestFilterTest {
         Mockito
                 .verify(servletRequest, Mockito.times(1))
                 .getParameter("choice");
-
         Mockito
                 .verify(servletRequest, Mockito.times(2))
                 .getPathInfo();
-
         Mockito
                 .verify(filterChain, Mockito.never())
                 .doFilter(servletRequest, servletResponse);
@@ -180,7 +145,6 @@ class QuestFilterTest {
         Mockito
                 .when(servletRequest.getParameter("choice"))
                 .thenReturn(choiceParam);
-
         Mockito
                 .when(servletRequest.getPathInfo())
                 .thenReturn(pathInfo);

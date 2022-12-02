@@ -26,8 +26,6 @@ import ru.javarush.quest.service.QuestService;
 import java.io.IOException;
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
-
 @ExtendWith(MockitoExtension.class)
 class QuestServletTest {
 
@@ -249,7 +247,6 @@ class QuestServletTest {
         Mockito
                 .when(session.getAttribute("currentQuest"))
                 .thenReturn(quest);
-
         Mockito
                 .when(session.getAttribute("failureCount"))
                 .thenReturn(failureCount);
@@ -260,10 +257,6 @@ class QuestServletTest {
 
         Mockito.verify(session, Mockito.times(1))
                 .setAttribute("failureCount", ++failureCount);
-        Mockito.verify(session, Mockito.times(1))
-                .getAttribute("currentQuest");
-        Mockito.verify(session, Mockito.never())
-                .invalidate();
     }
 
     @Test
@@ -349,7 +342,6 @@ class QuestServletTest {
         Mockito
                 .when(session.getAttribute("currentQuest"))
                 .thenReturn(quest);
-
         Mockito
                 .when(session.getAttribute("failureCount"))
                 .thenReturn(null);
@@ -377,7 +369,8 @@ class QuestServletTest {
     }
 
     @Test
-    void whenDoGetIfRequestHasChoiceParamAndChoiceHasNextStepThenSetAttributeCurrentStep() throws ServletException, IOException {
+    void whenDoGetIfRequestHasChoiceParamAndChoiceHasNextStepThenSetAttributeCurrentStep()
+            throws ServletException, IOException {
         setParamChoiceAndAttrStep("13", step);
 
         StepOutDto nextStep = StepOutDto.builder().build();
@@ -548,13 +541,7 @@ class QuestServletTest {
     @Test
     void whenDoGetIfRequestHasNotChoiceParamAndHasPathInfoThenStartQuestAndForwardToGamePage()
             throws ServletException, IOException {
-        Mockito
-                .when(req.getSession())
-                .thenReturn(session);
-
-        Mockito
-                .when(req.getPathInfo())
-                .thenReturn("quest/13");
+        setPathInfo();
 
         Mockito
                 .when(req.getRequestDispatcher(Mockito.anyString()))
@@ -571,13 +558,7 @@ class QuestServletTest {
     @Test
     void whenDoGetIfRequestHasNotChoiceParamAndHasPathInfoThenSetAttributeIsStartFalse()
             throws ServletException, IOException {
-        Mockito
-                .when(req.getSession())
-                .thenReturn(session);
-
-        Mockito
-                .when(req.getPathInfo())
-                .thenReturn("quest/13");
+        setPathInfo();
 
         Mockito
                 .when(req.getRequestDispatcher(Mockito.anyString()))
@@ -592,18 +573,11 @@ class QuestServletTest {
     @Test
     void whenDoGetIfRequestHasNotChoiceParamAndHasPathInfoThenSetStartStepAsAttributeCurrentStep()
             throws ServletException, IOException {
-        Mockito
-                .when(req.getSession())
-                .thenReturn(session);
-
-        Mockito
-                .when(req.getPathInfo())
-                .thenReturn("quest/13");
+        setPathInfo();
 
         Mockito
                 .when(questService.getStartStepByQuestId(13))
                 .thenReturn(step);
-
         Mockito
                 .when(req.getRequestDispatcher(Mockito.anyString()))
                 .thenReturn(requestDispatcher);
@@ -619,13 +593,7 @@ class QuestServletTest {
     @Test
     void whenDoGetIfRequestHasNotChoiceParamAndHasPathInfoThenSetAttributeCountOfStepOne()
             throws ServletException, IOException {
-        Mockito
-                .when(req.getSession())
-                .thenReturn(session);
-
-        Mockito
-                .when(req.getPathInfo())
-                .thenReturn("quest/13");
+        setPathInfo();
 
         Mockito
                 .when(req.getRequestDispatcher(Mockito.anyString()))
@@ -640,18 +608,11 @@ class QuestServletTest {
     @Test
     void whenDoGetIfRequestHasNotChoiceParamAndHasPathInfoThenSetAttributeCurrentQuest()
             throws ServletException, IOException {
-        Mockito
-                .when(req.getSession())
-                .thenReturn(session);
-
-        Mockito
-                .when(req.getPathInfo())
-                .thenReturn("quest/13");
+        setPathInfo();
 
         Mockito
                 .when(questService.getQuestById(13))
                 .thenReturn(quest);
-
         Mockito
                 .when(req.getRequestDispatcher(Mockito.anyString()))
                 .thenReturn(requestDispatcher);
@@ -660,31 +621,36 @@ class QuestServletTest {
 
         Mockito.verify(questService, Mockito.times(1))
                 .getQuestById(Mockito.anyLong());
-
         Mockito.verify(session, Mockito.times(1))
                 .setAttribute("currentQuest", quest);
     }
 
     @Test
     void whenDoGetIfChoiceParamAndPathInfoAreNullThenForwardToQuestPage() throws ServletException, IOException {
-        Mockito
-                .when(questService.getQuests())
-                .thenReturn(List.of(quest));
-        Mockito
-                .when(questServlet.getServletContext())
-                .thenReturn(servletContext);
-        Mockito
-                .when(servletContext.getRequestDispatcher(Mockito.anyString()))
-                .thenReturn(requestDispatcher);
+        forwardWithMockito();
 
         questServlet.doGet(req, resp);
 
-        Mockito.verify(req, Mockito.times(1))
-                .setAttribute("quests", List.of(quest));
         Mockito.verify(servletContext, Mockito.times(1))
                 .getRequestDispatcher("/quest.jsp");
         Mockito.verify(requestDispatcher, Mockito.times(1))
                 .forward(req, resp);
+    }
+
+    @Test
+    void whenDoGetIfChoiceParamAndPathInfoAreNullThenSetAttributeQuests() throws ServletException, IOException {
+        Mockito
+                .when(questService.getQuests())
+                .thenReturn(List.of(quest));
+
+        forwardWithMockito();
+
+        questServlet.doGet(req, resp);
+
+        Mockito.verify(questService, Mockito.times(1))
+                .getQuests();
+        Mockito.verify(req, Mockito.times(1))
+                .setAttribute("quests", List.of(quest));
     }
 
     private void setParamChoiceAndAttrStep(String choice, Object currentStep) {
@@ -701,7 +667,7 @@ class QuestServletTest {
                 .thenReturn(currentStep);
     }
 
-    private void forwardWithMockito() throws ServletException, IOException {
+    private void forwardWithMockito() {
         Mockito
                 .when(servletConfig.getServletContext())
                 .thenReturn(servletContext);
@@ -709,8 +675,14 @@ class QuestServletTest {
         Mockito
                 .when(servletContext.getRequestDispatcher(Mockito.anyString()))
                 .thenReturn(requestDispatcher);
+    }
 
-        doNothing()
-                .when(requestDispatcher).forward(req, resp);
+    private void setPathInfo() {
+        Mockito
+                .when(req.getSession())
+                .thenReturn(session);
+        Mockito
+                .when(req.getPathInfo())
+                .thenReturn("quest/13");
     }
 }
